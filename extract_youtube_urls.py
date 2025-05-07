@@ -23,7 +23,7 @@ def read_in_chunks(file_object, chunk_size=1024*1024*10):  # 10MB chunks
 # Read the HTML file and extract YouTube URLs
 youtube_data = []
 youtube_pattern = re.compile(r'(https?://(?:www\.)?(?:youtube\.com|youtu\.be)/[^\s"\'\\\/<>]+)')
-service_pattern = re.compile(r'youtube|youtube music|youtube studio', re.IGNORECASE)
+service_pattern = re.compile(r'youtube music|youtube', re.IGNORECASE)
 
 try:
     # Process in chunks
@@ -40,13 +40,17 @@ try:
                 context_end = chunk.find(url)
                 context = chunk[context_start:context_end]
                 
-                service = "YouTube"  # Default
+                name = "YouTube"  # Default
                 service_match = service_pattern.search(context)
                 if service_match:
-                    service = service_match.group(0)
+                    matched_text = service_match.group(0).lower()
+                    if "music" in matched_text:
+                        name = "YouTube Music"
+                    else:
+                        name = "YouTube"
                 
                 youtube_data.append({
-                    'service': service,
+                    'name': name,
                     'url': url
                 })
     
